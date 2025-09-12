@@ -5,6 +5,8 @@ public class PiceMove : MonoBehaviour
 {
     [SerializeField] float timeCount;
     float cout;
+    [SerializeField] float timeCountFlip;
+    float countFlip;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -15,9 +17,14 @@ public class PiceMove : MonoBehaviour
     void Update()
     {
         Move();
+        Flip();
         if (cout > 0)
         {
             cout -= Time.deltaTime;
+        }
+        if (countFlip > 0)
+        {
+            countFlip -= Time.deltaTime;
         }
     }
     void Move()
@@ -30,6 +37,14 @@ public class PiceMove : MonoBehaviour
         }
         if (horizontal == 0)
             cout = 0;
-        
+
+    }
+    void Flip()
+    {
+        if (InputManager.GetMovementInput() && countFlip <= 0)
+        {
+            countFlip = timeCountFlip;
+            transform.Rotate(0, 0, 90);
+        }
     }
 }
