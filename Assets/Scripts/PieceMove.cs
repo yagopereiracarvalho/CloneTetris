@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PiceMove : MonoBehaviour
+public class PieceMove : MonoBehaviour
 {
+    float fall;
     [SerializeField] float timeCount;
     float cout;
     [SerializeField] float timeCountFlip;
@@ -18,6 +20,8 @@ public class PiceMove : MonoBehaviour
     {
         Move();
         Flip();
+        Piecefall();
+
         if (cout > 0)
         {
             cout -= Time.deltaTime;
@@ -26,6 +30,7 @@ public class PiceMove : MonoBehaviour
         {
             countFlip -= Time.deltaTime;
         }
+
     }
     void Move()
     {
@@ -47,4 +52,13 @@ public class PiceMove : MonoBehaviour
             transform.Rotate(0, 0, 90);
         }
     }
+    void Piecefall()
+    {
+        if (Time.time - fall >= GameController.instance.Speed)
+        {
+            transform.position += new Vector3(0, -1, 0);
+            fall = Time.time;
+        }
+    }
+
 }
