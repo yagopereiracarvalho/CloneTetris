@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -29,10 +30,47 @@ public class GameController : MonoBehaviour
     {
         return ((int)position.x >= 0 && (int)position.x < width && (int)position.y >= 0);
     }
-    public Vector2  Round(Vector2 position)
+    public Vector2 Round(Vector2 position)
     {
         return new Vector2(Mathf.Round(position.x),
     Mathf.Round(position.y));
     }
 
+    public Transform TransformGridPosition(Vector2 position)
+    {
+        if (position.y > height - 1)
+        {
+            return null;
+        }
+        else
+        {
+            return grid[(int)position.x, (int)position.y];
+        }
+    }
+
+    public void UpdateGrid(PieceMove pieceTetris)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (grid[x, y] != null)
+                {
+                    if (grid[x, y].parent == pieceTetris.transform)
+                    {
+                        grid[x, y] = null;
+                    }
+                }
+            }
+        }
+
+     foreach(Transform piece in pieceTetris.transform)
+        {
+            Vector2 position = Round(piece.position);
+            if(position.y < height)
+            {
+                grid[(int)position.x, (int)position.y] = piece;
+            }
+        }
+    }
 }
