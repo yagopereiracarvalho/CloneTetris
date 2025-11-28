@@ -129,6 +129,7 @@ public class PieceMove : MonoBehaviour
                   transform.position += new Vector3(0, 1, 0);
                 enabled = false;
                 spawnTetro.SetNextPieceStatus(true);
+                GameController.instance.Deleteline();
             }
         }
 
@@ -169,7 +170,7 @@ public class PieceMove : MonoBehaviour
                 transform.position += new Vector3(0, 1, 0);
                 enabled = false;
                 spawnTetro.SetNextPieceStatus(true);
-                
+                GameController.instance.Deleteline();
             }
         }
     }

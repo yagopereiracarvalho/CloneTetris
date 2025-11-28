@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -7,6 +9,7 @@ public class GameController : MonoBehaviour
     static int height = 20;
     static int width = 10;
     static Transform[,] grid = new Transform[width, height]; 
+    private int[] indexLine = new int[4];
     public static GameController instance;
     public float Speed { get { return speed;} }
 
@@ -18,7 +21,11 @@ public class GameController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        for(int i = 0; i < 4 ; i++) 
+        {
+            indexLine[i] = -1;
+        } 
+            
     }
 
     // Update is called once per frame
@@ -73,4 +80,76 @@ public class GameController : MonoBehaviour
             }
         }
     }
-}
+
+    public bool FullLine(int y)
+    {
+        for(int x = 0; x <width; x++) 
+        {
+            if (grid[x, y] == null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void DeleteSquare(int y)
+    {
+        for(int x = 0; x < width; x++)
+        {
+            grid[x,y].GetComponent<SpriteRenderer>().enabled = false;
+            Destroy(grid[x,y].gameObject);
+            grid[x,y]= null;
+        }
+
+    }
+
+    public void Deleteline()
+    {
+        for(int y = 0; y < height; y++)
+        {
+            if (FullLine(y))
+            {
+                for(int i = 0; i < indexLine.Length ; i++)
+                {
+                    if(indexLine[i]< 0)
+                    {
+                        indexLine [i] = y ;
+                        break;
+                    }
+                }
+                DeleteSquare(y);
+                y--;
+            }
+        }
+        for(int i = indexLine.Length - 1; i >= 0; i--)
+        {
+            if (indexLine[i] >= 0)
+            {
+                MoveAllLineDown(indexLine[i] + 1);
+                indexLine[i] = - 1;
+            }
+        }
+    }
+
+    public void MoveLineDown(int y)
+    {
+        for(int x = 0; x < width ; x++)
+        {
+            if(grid[x,y] != null)
+            {
+                grid[x,y -1 ] = grid[x,y];
+                grid[x,y] = null;
+                grid[x,y - 1 ].position += new Vector3(0, -1, 0);
+            }
+        } 
+    }
+    public void MoveAllLineDown(int y)
+    {
+        for(int i = y; i <height ; i++) 
+        {
+            MoveLineDown(i);    
+        }
+    }
+    
+ }
