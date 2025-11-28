@@ -19,10 +19,12 @@ public class PieceMove : MonoBehaviour
 
     [SerializeField] bool canRotate;
     [SerializeField] bool Rotate360; 
+    [SerializeField] SpawnTetro spawnTetro;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+    spawnTetro = GameObject.FindFirstObjectByType<SpawnTetro>();
+    spawnTetro.SetNextPieceStatus(false);
     }
 
     // Update is called once per frame
@@ -120,11 +122,13 @@ public class PieceMove : MonoBehaviour
              if (Valideteposition())
             {
                  GameController.instance.UpdateGrid(this);
+                
             }
             else
             {
                   transform.position += new Vector3(0, 1, 0);
-                
+                enabled = false;
+                spawnTetro.SetNextPieceStatus(true);
             }
         }
 
@@ -158,11 +162,13 @@ public class PieceMove : MonoBehaviour
              if (Valideteposition())
             {
                  GameController.instance.UpdateGrid(this);
+                 
             }
             else
             {
                 transform.position += new Vector3(0, 1, 0);
                 enabled = false;
+                spawnTetro.SetNextPieceStatus(true);
                 
             }
         }
