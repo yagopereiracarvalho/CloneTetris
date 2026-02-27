@@ -41,6 +41,10 @@ public class InputManager : MonoBehaviour
         countFlip = flipTime;
         flipInput = Value.isPressed;
     }
+    public void OnPause(InputValue value)
+    {
+        GameController.instance.PauseGame();
+    }
     public static bool GetMovementInput()
     {
         return instance.flipInput;

@@ -1,17 +1,27 @@
-using System.ComponentModel;
-using Unity.Mathematics;
-using Unity.VisualScripting;
+using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] float speed;
+    [SerializeField]int score = 0;
+    [SerializeField]int lineDeleted;
+    [SerializeField]int difficulty = 1;
+
+    [SerializeField] TextMeshProUGUI scoreText;
+    [SerializeField] TextMeshProUGUI pointsText;
+    [SerializeField] TextMeshProUGUI difficultyText;
+    [SerializeField] GameObject pauseGo;
     static int height = 20;
     static int width = 10;
     static Transform[,] grid = new Transform[width, height]; 
     private int[] indexLine = new int[4];
+    [SerializeField] bool isPaused;
     public static GameController instance;
     public float Speed { get { return speed;} }
+    public bool IsPaused { get { return isPaused;} }
+    public int Difficulty{get{return difficulty;}}
 
 
     void Awake()
@@ -31,7 +41,8 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        scoreText.text = UpdateScore();
+        difficultyText.text = difficulty.ToString();
     }
     public bool InsideGrid(Vector2 position)
     {
@@ -96,9 +107,10 @@ public class GameController : MonoBehaviour
     public void DeleteSquare(int y)
     {
         for(int x = 0; x < width; x++)
-        {
+        {            
             grid[x,y].GetComponent<SpriteRenderer>().enabled = false;
-            Destroy(grid[x,y].gameObject);
+            grid[x,y].GetComponentInChildren<ParticleSystem>().Play();
+            Destroy(grid[x,y].gameObject, 1f);
             grid[x,y]= null;
         }
 
@@ -106,30 +118,31 @@ public class GameController : MonoBehaviour
 
     public void Deleteline()
     {
-        for(int y = 0; y < height; y++)
-        {
-            if (FullLine(y))
-            {
-                for(int i = 0; i < indexLine.Length ; i++)
-                {
-                    if(indexLine[i]< 0)
-                    {
-                        indexLine [i] = y ;
-                        break;
-                    }
-                }
-                DeleteSquare(y);
-                y--;
-            }
-        }
-        for(int i = indexLine.Length - 1; i >= 0; i--)
-        {
-            if (indexLine[i] >= 0)
-            {
-                MoveAllLineDown(indexLine[i] + 1);
-                indexLine[i] = - 1;
-            }
-        }
+        // for(int y = 0; y < height; y++)
+        // {
+        //     if (FullLine(y))
+        //     {
+        //         for(int i = 0; i < indexLine.Length ; i++)
+        //         {
+        //             if(indexLine[i]< 0)
+        //             {
+        //                 indexLine [i] = y ;
+        //                 break;
+        //             }
+        //         }
+        //         DeleteSquare(y);
+        //         y--;
+        //     }
+        // }
+        // for(int i = indexLine.Length - 1; i >= 0; i--)
+        // {
+        //     if (indexLine[i] >= 0)
+        //     {
+        //         MoveAllLineDown(indexLine[i] + 1);
+        //         indexLine[i] = - 1;
+        //     }
+        // }
+        StartCoroutine(WaitingTime());
     }
 
     public void MoveLineDown(int y)
@@ -151,5 +164,132 @@ public class GameController : MonoBehaviour
             MoveLineDown(i);    
         }
     }
+
+    public string UpdateScore()
+    {
+        string scoreTempText = "";
+
+        if (score == 0)
+        {
+            scoreTempText ="000000";
+        }
+        else if (score > 0 && score < 100)
+        {
+            scoreTempText =  "0000" + score.ToString();
+        }
+          else if (score >= 100 && score < 1000)
+        {
+            scoreTempText =  "000" + score.ToString();
+        }
+          else if (score >= 1000 && score < 10000)
+        {
+            scoreTempText =  "00" + score.ToString();
+        }
+          else if (score >= 10000 && score < 100000)
+        {
+            scoreTempText =  "0" + score.ToString();
+        }
+          else 
+        {
+            scoreTempText = score.ToString();
+        }
+
+        return scoreTempText;
+    }
+
+    public void AddScore(int points)
+    {
+        score += points;
+    }
+    public void PauseGame()
+    {
+        if (isPaused)
+        {
+            Time.timeScale = 1.0f;
+            pauseGo.SetActive(false);
+            isPaused = false;
+        }
+        else
+        {
+            Time.timeScale = 0;
+            pauseGo.SetActive(true);
+            isPaused =(true);
+        }
+    }
     
+    IEnumerator WaitingTime()
+    {
+        for(int y = 0; y < height; y++)
+        {
+            if (FullLine(y))
+            {
+                isPaused = true;
+                for(int i = 0; i < indexLine.Length ; i++)
+                {
+                    if(indexLine[i]< 0)
+                    {
+                        indexLine [i] = y ;
+                        break;
+                    }
+                }
+                DeleteSquare(y);
+                y--;
+            }
+        }
+
+        yield return new WaitForSeconds(1.1f);
+
+        int points = 0;
+        int scoreTotal = 0; 
+
+        for(int i = indexLine.Length - 1; i >= 0; i--)
+        {
+            if (indexLine[i] >= 0)
+            {
+                points++;
+                MoveAllLineDown(indexLine[i] + 1);
+                indexLine[i] = - 1;
+            }
+        }
+
+        switch (points)
+        {
+            case 1: 
+            scoreTotal = 100 * difficulty;
+            StartCoroutine(PointsText(scoreTotal));
+            score += scoreTotal;
+            break;
+              case 2: 
+            scoreTotal = 300 * difficulty;
+            StartCoroutine(PointsText(scoreTotal));
+              score += scoreTotal;
+            break;
+              case 3: 
+            scoreTotal = 600 * difficulty;
+            StartCoroutine(PointsText(scoreTotal));
+              score += scoreTotal;
+            break;
+              case 4: 
+            scoreTotal = 1000 * difficulty;
+            StartCoroutine(PointsText(scoreTotal));
+              score += scoreTotal;
+            break;
+        }
+        lineDeleted += points;
+        if(lineDeleted >= 10)
+        {
+            lineDeleted -= 10;
+            difficulty++;
+        }
+
+        isPaused = false;
+    }
+
+    IEnumerator PointsText(int points)
+    {
+        pointsText.enabled = true;
+        pointsText.text = "+" + points.ToString();
+        yield return new WaitForSeconds(.5f);
+        pointsText.enabled = false;
+    }
  }
