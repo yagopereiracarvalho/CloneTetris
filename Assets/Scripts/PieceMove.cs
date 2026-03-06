@@ -33,7 +33,7 @@ public class PieceMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!GameController.instance.IsPaused)
+        if(!GameController.instance.IsPaused && !GameController.instance.IsGameOver)
         {
             Move();
             Flip();
@@ -135,7 +135,14 @@ public class PieceMove : MonoBehaviour
                 GameController . instance.AddScore(10);
                   transform.position += new Vector3(0, 1, 0);
                 enabled = false;
-                spawnTetro.SetNextPieceStatus(true);
+                if (GameController.instance.OverGrid(this))
+                {
+                    GameController.instance.GameOver();
+                }
+               if (!GameController.instance.IsGameOver)
+                {
+                   spawnTetro.SetNextPieceStatus(true);
+                }
                 GameController.instance.Deleteline();
             }
         }
@@ -177,7 +184,14 @@ public class PieceMove : MonoBehaviour
                  GameController . instance.AddScore(10);
                 transform.position += new Vector3(0, 1, 0);
                 enabled = false;
-                spawnTetro.SetNextPieceStatus(true);
+                if (GameController.instance.OverGrid(this))
+                {
+                    GameController.instance.GameOver();
+                }
+                if (!GameController.instance.IsGameOver)
+                {
+                   spawnTetro.SetNextPieceStatus(true);
+                }
                 GameController.instance.Deleteline();
             }
         }

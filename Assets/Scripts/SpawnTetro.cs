@@ -23,7 +23,9 @@ public class SpawnTetro : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (NextPieceSend && cout <= 0)
+        if (!GameController.instance.IsGameOver)
+        {
+            if (NextPieceSend && cout <= 0)
         {
             NextPiece();
             cout = 1;
@@ -31,6 +33,7 @@ public class SpawnTetro : MonoBehaviour
         if (cout > 0)
         {
             cout -= Time.deltaTime;
+        }
         }
 
     }

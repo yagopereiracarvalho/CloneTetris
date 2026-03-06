@@ -40,6 +40,10 @@ public class InputManager : MonoBehaviour
     {
         countFlip = flipTime;
         flipInput = Value.isPressed;
+        if (GameController.instance.IsGameOver)
+        {
+            GameController.instance.RestartGame();
+        }
     }
     public void OnPause(InputValue value)
     {

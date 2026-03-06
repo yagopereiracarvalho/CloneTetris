@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameController : MonoBehaviour
@@ -13,6 +14,8 @@ public class GameController : MonoBehaviour
     [SerializeField] TextMeshProUGUI pointsText;
     [SerializeField] TextMeshProUGUI difficultyText;
     [SerializeField] GameObject pauseGo;
+    [SerializeField] GameObject gameOverGo;
+    [SerializeField] bool isGameOver;
     static int height = 20;
     static int width = 10;
     static Transform[,] grid = new Transform[width, height]; 
@@ -21,6 +24,7 @@ public class GameController : MonoBehaviour
     public static GameController instance;
     public float Speed { get { return speed;} }
     public bool IsPaused { get { return isPaused;} }
+        public bool IsGameOver { get { return isGameOver;} }
     public int Difficulty{get{return difficulty;}}
 
 
@@ -216,6 +220,32 @@ public class GameController : MonoBehaviour
             isPaused =(true);
         }
     }
+
+    public bool OverGrid(PieceMove pieceTetris)
+    {
+        for(int x = 0; x < width; x++)
+        {
+            foreach (Transform piece in pieceTetris.transform)
+            {
+                Vector2 position = Round(piece.position);
+                if (position.y > height - 1)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public void GameOver()
+    {
+        isGameOver = true;
+        gameOverGo.SetActive(true);
+    }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+
     
     IEnumerator WaitingTime()
     {
